@@ -99,3 +99,36 @@ A processor topology is merely a logical abstraction for your stream processing 
 
 ![img](https://kafka.apache.org/28/images/streams-architecture-overview.jpg)
 
+### Time
+
+A criticak aspect in stream processing is the notion of time, and how it is modeled and integrated. For example, some operations such as windowing are defined based on time boundaries.
+
+时间概念是
+
+
+
+### Duality Of Streams and Tables
+
+
+
+### Aggregations
+
+
+
+### Windowing
+
+
+
+### States
+
+
+
+## Processing Guarantees
+
+
+
+### Out-of-Order handling
+
+
+
+### 
