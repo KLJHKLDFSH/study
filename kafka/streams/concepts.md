@@ -213,9 +213,57 @@ For aggregations and joins, timestamp are computers by using the follwing rules:
 
 ### Duality Of Streams and Tables
 
+When implementing stream processing use cases in practice, you typically need both streams and also database. In other words, streams are everywhere , bu databases are everywhere too.
 
+```
+当在实际实施流处理案例中，你通常即需要流又需要数据库。
+```
+
+Any stream processing technology must therefore provide **first-class support for steams and tables.** Kafka's Streams API provides such functionality through its core abstractions for streams and tables, which we will talk about in a minute. Now , an interesting observation is that there is actually a close relationship between streams and tables, the so-called streams-table duality. And Kafka exploits this duality in many ways: for example , to make your applications elastic, to support fault-tolerant stateful processing, or to run interactive queries against you application's latest processing results. And beyond its internal usage, the Kafka Streams API also allows developers to exploit this duality in their own applications.
+
+```
+因此，任何流处理技术必须提供一流的流和表支持。Kafka Stream API 通过对流和表的核心抽象提供此类功能,我们将花一分钟来讨论它。一个有趣的观察是流和表之间其实有紧密的关系，所我我们称为流-表二元性。并且kafka在很多地方利用这种二元性。例如：让你的应用程序具有扩展性，支持容错状态处理，或者针对应用程序的最新处理结果运行交互式查询。而且处理内部使用外，Kafka streams api 也允许开发者在自己的应用程序中利用这种二元性。
+```
+
+Before we discuss concepts such as aggregations in Kafka Streams, we must first introduce tables in more detail, and talk about the aforementioned streams-tables duality.Essentially, this duality means that a stream can be viewed as a table, and a table can be viewed as stream. Kafka's log compaction feature, for example, exploits this duality.
+
+```
+在我们讨论如Kafka streams 中的聚合之类的概念之前，我们必须先更详细的介绍表。并且讨论之前的流-表二元性。本质上，这个二元性的意思是流可以看作是表，表格同样可以看作是流。kafka 的日志压缩特效就是利用了这个二元性。
+```
+
+A simple form of a table is a collection of key-value pairs, also called a map or associative array.Such a table may look as follows:
+
+```
+表的简单形式是键值对的集合，也叫映射或关联数组。这样的表可能如下：
+```
+
+
+
+![img](https://kafka.apache.org/28/images/streams-table-duality-01.png)
+
+The stream-table duality describes the close relationship between streams and tables.
+
+- **Stream as Table:** A stream can be considered a changelog of a table, where       each data record in the stream captures a state change of the table. A stream is thus a table in disguise, and it can be easily turned into a "real" table by replaying the changelog from beginning to end to reconstruct the table. Similarly, in a more general analogy, aggregating data records in a stream such as computing the total number of page views by user from a stream of pageview events will return a table(here with the key and the value being the user and its corresponding pageview count, respectively).
+
+  ```
+  流可以看作是表的日记变更，其中流中的每个数据都捕获表的状态变更。因此，流是变相的表。并且可以通过从头到尾重播变更日志以重新构建变，轻松的变成“真实”表。
+  ```
+
+- **Table as Stream:** A table can be considered a snapshot, at a point in time, of the latest value for each key in a stream(a stream's data records are key-value pairs). A table is thus a stream in disguise, and it can be easily turned into a "real" stream by iterating over each key-value entry in the table.
+
+  ```
+  可以将表看作某个时间点上流中的每个键的最新值的快照。因此，表是变相的流，并且它可以通过遍历表中的每个键值对轻松的转换为”真正“的流。
+  
+  转换为流：但不是表示转换为原来的流，流的数据发生的变更。
+  ```
+
+
+
+Let‘s illustrate
 
 ### Aggregations
+
+
 
 
 
@@ -223,7 +271,7 @@ For aggregations and joins, timestamp are computers by using the follwing rules:
 
 
 
-### States
+###States
 
 
 
