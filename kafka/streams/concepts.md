@@ -263,7 +263,17 @@ Let‘s illustrate
 
 ### Aggregations
 
+An aggregation operation takes one input stream or table, and yields a new table by combining multiple input records into a single output record. Examples of aggregations are computing counts or sum.
 
+```
+聚合操作采用一个输入流或表，并通过合并多个输入记录为单个输出记录来生成一个新表。聚合的事例是计算计数和总和。
+```
+
+In the `Kafka Stream DSL`, an intput stream of an `aggregation` can be a KStream or a KTable, but the output stream will always be a Stable. This allows Kafka Streams to update an aggregate value upon the out-of-order arrival of further records after the value was produced and emitted. When such out-of-order arrival happens, the aggregations Kstream or KTable emits a new aggregate value. Because the output is a KTable, the new value is considered to overwrite the old value with the same key in subsequent processing steps.
+
+```
+在DSL中，聚合的输入流可以是KStream或KTable，但输出流始终是KTable。这使得Kafka Streams 在产生和发生值后，如果其他记录无序到达，则可以更新汇总值。当发生这种无序到达时，聚合的KStream或KTable会发出新的聚合值。由于输出是表，因此在后续的处理步骤中，新值将被视为使用相同的键覆盖旧值。
+```
 
 
 
@@ -271,7 +281,7 @@ Let‘s illustrate
 
 
 
-###States
+### States
 
 
 
