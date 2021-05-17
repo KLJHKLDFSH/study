@@ -101,7 +101,7 @@ A processor topology is merely a logical abstraction for your stream processing 
 
 ### Time
 
-A criticak aspect in stream processing is the notion of time, and how it is modeled and integrated. For example, some operations such as windowing are defined based on time boundaries.
+A critical aspect in stream processing is the notion of time, and how it is modeled and integrated. For example, some operations such as windowing are defined based on time boundaries.
 
 流处理的一个关键方面是时间的概念，以及如何建模和集成它。例如，windowing 是基于时间边界定义的。
 
@@ -109,25 +109,25 @@ A criticak aspect in stream processing is the notion of time, and how it is mode
 
 common notions of time in streams are:
 
-- **Event time:** The point in time when an event or data record occurred, i.e. was originally created "at the source". Example: if the event is geo-localtion change reported by a GPS sensor in a car, then the associated event-time would be the time when the GSP sensor captured the localtion change.
+- **Event time:** The point in time when an event or data record occurred, i.e. was originally created "at the source". Example: if the event is geo-location change reported by a GPS sensor in a car, then the associated event-time would be the time when the GSP sensor captured the location change.
 
   ```
   事件时间： 事件或数据记录发生的时间点，例子：如果事件是汽车中的GPS传感器报告的地理位置变化，那么相关的事件时间就是GPS传感器捕获到位置变化的时间。
   ```
 
-- **Processing time:** The point in time when the event or data record happend to be processed by the streams processing appliction, i.e. when the record is being consumed. The processing time may be milliseconds, hours, or days etc. later than the orginal event time. **Example:** Imagine an analytics application that reads and processes the geo-localtion data reported from car sensors to present it to a fleet management dashboard.Here, processing-time in the analytics application might be  milliseconds or seconds(e.g for real-time piplines based on Apache Kafka and Kafka Streams) or hours(e.g. for batch pipelines based on Apache Hadoop or Apache Spark) after event-time.
+- **Processing time:** The point in time when the event or data record happens to be processed by the streams processing application, i.e. when the record is being consumed. The processing time may be milliseconds, hours, or days etc. later than the original event time. **Example:** Imagine an analytics application that reads and processes the geo-location data reported from car sensors to present it to a fleet management dashboard. Here, processing-time in the analytics application might be  milliseconds or seconds(e.g for real-time pipelines based on Apache Kafka and Kafka Streams) or hours(e.g. for batch pipelines based on Apache Hadoop or Apache Spark) after event-time.
 
   ```
   处理时间： 事件或记录发生在被流处理应用处理时的时间点，例如当记录被消费时。处理时间或许是毫秒，秒，小时，天。但晚于原始的事件时间。例子：想象一下分析程序在读和处理从车载传感器提交的地理数据并展示在车队管理仪表盘。这里，处理时间是在事件时间之后几豪秒、几秒、几小时。（取决与处理程序）
   ```
 
-- **Ingestion time:** The point in time when an event or data record is stored in a topic partition by Kafka broker.The difference to event time is that this ingestion timestamp is generated when the record is appended to the target topic by the Kafaka broker, not when the record is create "at the source". The difference to procesessing time is that processing time is when the stream processing application processes the record. **For example**, if a record is never processed, there is no notion of processing time for it, but it still has an ingestion time.
+- **Ingestion time:** The point in time when an event or data record is stored in a topic partition by Kafka broker. The difference to event time is that this ingestion timestamp is generated when the record is appended to the target topic by the Kafka broker, not when the record is create "at the source". The difference to processing time is that processing time is when the stream processing application processes the record. **For example**, if a record is never processed, there is no notion of processing time for it, but it still has an ingestion time.
 
   ```
   摄取时间：事件或数据记录通过Kafka broker 存储到topic 分区的时间点。不同与事件时间的是摄取时间戳是当记录被添加到指定的topic 分区时通过Kafka broker生成的，而不是“源头”创建记录时生成的。它与处理时间的区别在于处理时间是流处理应用处理记录的时间。例子：如果记录从未被处理过，它没有处理时间的概念，但是它一直有摄取时间。
   ```
 
-The choice between event-time and ingestion time is actually done through the configuration of Kafka(not Kafka Streams): From Kafka 0.10.x onwards, timestamps are automatically embedded into Kafka messages. Depending on Kafka's configuration these timestamps represent event-time or ingestion-time. The respective Kafka configuration setting can be specified on the broker level or per topic.The default timestamp extractor in Kafka Streams will retrieve these embedded timestamps as-is. Hence, the effective time sematics of your application depend on the effiective kafka configuration for these embedded timestamps.
+The choice between event-time and ingestion time is actually done through the configuration of Kafka(not Kafka Streams): From Kafka 0.10.x onwards, timestamps are automatically embedded into Kafka messages. Depending on Kafka's configuration these timestamps represent event-time or ingestion-time. The respective Kafka configuration setting can be specified on the broker level or per topic. The default timestamp extractor in Kafka Streams will retrieve these embedded timestamps as-is. Hence, the effective time semantics of your application depend on the effective Kafka configuration for these embedded timestamps. 
 
 ```
 事件时间和摄入时间之间的选择实际上是通过Kafka的配置来完成的。（而不是kafka Streams）:自从kafka 0.10.x 开始，时间戳自动嵌入到kafka 消息中。根据kafka的配置，这些时间戳表示时间时间或者摄入时间。可以在代理级别或每个主题上指定相应的kafka配置设置。Kafka Streams 中的默认时间戳提取器将按原样提取这些嵌入的时间戳。因此，你应用程序的有效的时间语义取决于这些嵌入式时间戳的有效kafka配置。
@@ -135,7 +135,7 @@ The choice between event-time and ingestion time is actually done through the co
 
 
 
-Kafka Streams assigns a **timestamp** to every data record via the `TimestampExtractor` interface. These per-record timestamps describe  the progress os a stream with regards to time and are leveraged by time-dependent operations such as window operations.As a result, this time will only advance when a new record arrives at the processor. We call this data-driven time the **stream time** of the application to differentiate will the wall-clock time when this application is actually executing.Implementations of the `TimestampExtractor` interface willthen provide different semantics to the stream time definition. For example retrieving or computing timestamps based on the actual contents of data records such as an embedded timestamp field to provide event time semantics, and returning the current wall-clock time thereby yield processing time semantics to stream time. Developers can thus enforce different notions of time depending on their business needs.
+Kafka Streams assigns a **timestamp** to every data record via the `TimestampExtractor` interface. These per-record timestamps describe  the progress of  a stream with regards to time and are leveraged by time-dependent operations such as window operations. As a result, this time will only advance when a new record arrives at the processor. We call this data-driven time the **stream time** of the application to differentiate will the wall-clock time when this application is actually executing. Implementations of the `TimestampExtractor` interface will then provide different semantics to the stream time definition. For example retrieving or computing timestamps based on the actual contents of data records such as an embedded timestamp field to provide event time semantics, and returning the current wall-clock time thereby yield processing time semantics to stream time. Developers can thus enforce different notions of time depending on their business needs.
 
 ```
 Kafka streams 通过 TimestampExtractor 接口分配一个时间戳到每一个数据记录。
@@ -161,7 +161,7 @@ Finally, whenever a Kafka Streams application writes records to Kafka, then it w
   当处理一些数据记录生成新的输出记录时，例如，在process()函数调用中触发的 context.forward()，输出记录的时间戳是直接集成输入记录的时间戳的。
   ```
 
-- When new output records are generated via periodic funcations such as `Punctuator#punctuate()`,  the output record timestamp is defined as the current internal time (obtianed through context.timestamp() ) of the stream task.
+- When new output records are generated via periodic functions such as `Punctuator#punctuate()`,  the output record timestamp is defined as the current internal time (obtained through context.timestamp() ) of the stream task.
 
   ```
   通过周期性函数(例如 Punctuator#punctuate())生成新的输出记录时，输出记录时间戳定义为流任务的当前内部时间（通过context.timestamp()获得）。
@@ -177,13 +177,13 @@ Finally, whenever a Kafka Streams application writes records to Kafka, then it w
 
   
 
-You can change the default behavior in the Processor Api by assigning timestamps to output records explicitly when calling `#forword()`.
+You can change the default behavior in the Processor API by assigning timestamps to output records explicitly when calling `#forword()`.
 
 ```
 你可以通过在调用forword()时显示地将时间戳分配给输出记录来更改Processor Api中的默认行为。
 ```
 
-For aggregations and joins, timestamp are computers by using the follwing rules:
+For aggregations and joins, timestamp are computers by using the following rules:
 
 - For joins `stream-steam`, `table-table` that have left and right input records, the timestamp of the output record timestamp is assigned `max(left.ts, right.ts)`.
 
@@ -197,7 +197,7 @@ For aggregations and joins, timestamp are computers by using the follwing rules:
   对于流和表的联接，输出记录的分配来源流记录
   ```
 
-- For aggregations, Kafka Streams also computes the max timestamp over all recoreds, per key, either globally(for non-windowed) or per-window.
+- For aggregations, Kafka Streams also computes the max timestamp over all records, per key, either globally(for non-windowed) or per-window.
 
   ```
   对于聚合，kafka stream 还可以全局或针对每一个窗口，针对每个键计算所有记录的最大时间戳。
@@ -225,13 +225,13 @@ Any stream processing technology must therefore provide **first-class support fo
 因此，任何流处理技术必须提供一流的流和表支持。Kafka Stream API 通过对流和表的核心抽象提供此类功能,我们将花一分钟来讨论它。一个有趣的观察是流和表之间其实有紧密的关系，所我我们称为流-表二元性。并且kafka在很多地方利用这种二元性。例如：让你的应用程序具有扩展性，支持容错状态处理，或者针对应用程序的最新处理结果运行交互式查询。而且处理内部使用外，Kafka streams api 也允许开发者在自己的应用程序中利用这种二元性。
 ```
 
-Before we discuss concepts such as aggregations in Kafka Streams, we must first introduce tables in more detail, and talk about the aforementioned streams-tables duality.Essentially, this duality means that a stream can be viewed as a table, and a table can be viewed as stream. Kafka's log compaction feature, for example, exploits this duality.
+Before we discuss concepts such as aggregations in Kafka Streams, we must first introduce tables in more detail, and talk about the aforementioned streams-tables duality. Essentially, this duality means that a stream can be viewed as a table, and a table can be viewed as stream. Kafka's log compaction feature, for example, exploits this duality.
 
 ```
 在我们讨论如Kafka streams 中的聚合之类的概念之前，我们必须先更详细的介绍表。并且讨论之前的流-表二元性。本质上，这个二元性的意思是流可以看作是表，表格同样可以看作是流。kafka 的日志压缩特效就是利用了这个二元性。
 ```
 
-A simple form of a table is a collection of key-value pairs, also called a map or associative array.Such a table may look as follows:
+A simple form of a table is a collection of key-value pairs, also called a map or associative array. Such a table may look as follows:
 
 ```
 表的简单形式是键值对的集合，也叫映射或关联数组。这样的表可能如下：
@@ -259,7 +259,31 @@ The stream-table duality describes the close relationship between streams and ta
 
 
 
-Let‘s illustrate
+Let's illustrate this with an example. Imagine a table that tracks the total number of pageviews by user (first column of diagram below). Over time, whenever a new pageview event is processed, the state of the table is update accordingly. Here the state changes between different points in time - and different revisions of the table -can be represented as a changelog stream(second column).
+
+```
+让我们用一个例子来说明这一点。想象一下一张表，它用来追踪用户的总浏览量。随着时间的推移，新的浏览被处理，因此，这张表的状态一直在更新。在这里，状态在不同时间点的变化，表的不同版本可以表示为更改变更日志流（第二列）
+```
+
+![img](http://kafka.apache.org/28/images/streams-table-duality-02.png)
+
+Interestingly, because of the stream-table duality, the same streams can be used to reconstruct the original table(third column).
+
+```
+有趣的是，由于流-表二元性，相同的流可以被用来重构原来的表。
+```
+
+
+
+![img](http://kafka.apache.org/28/images/streams-table-duality-03.png)
+
+The same mechanism is used, for example, to replicate databases via change data capture(CDC) and, within Kafka Streams, to replicate its so-called state stores across machines for fault-tolerance. The stream-table duality is such an important concept that Kafka Streams models it explicitly via the `KStream`, `KTable`, and `GlobleTable` interface.
+
+```
+例如，使用相同的机制通过更改数据捕获复制数据库，并在Kafka Streams 中使用这种机制跨机器复制其所谓的状态存储以实现容错，流-表的二元性是一个非常重要的概念，Kafka Streams 通过KStream，Ktable，GlobleTable接口对其进行显式建模。
+```
+
+
 
 ### Aggregations
 
