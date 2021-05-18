@@ -326,7 +326,7 @@ In the `Kafka Stream DSL`, an intput stream of an `aggregation` can be a KStream
 Some stream processing application don't require state, which means the processing of a message is independent from the processing of all other messages. However, being able to maintain state opens up many possibilities for sophisticated stream processing applications: you can join input streams, or group and aggregate data records. Many such stateful operators are provided by the Kafka Stream DSL.
 
 ```
-一些流处理应用不需要状态，意味着消息处理是不依赖于来自任何其他消息的。然而，能够维持状态为复杂的流处理程序打开了许多可能性：你可以加入输入流，或者进行分组和聚合数据记录，Kafka Stream DSL 提供了许多这样有状态的操作。
+一些流处理应用不需要状态，意味着消息的处理独立于所有其他消息的处理。然而，能够维持状态为复杂的流处理程序打开了许多可能性：你可以加入输入流，或者进行分组和聚合数据记录，Kafka Stream DSL 提供了许多这样有状态的操作。
 ```
 
 
