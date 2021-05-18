@@ -299,13 +299,11 @@ In the `Kafka Stream DSL`, an intput stream of an `aggregation` can be a KStream
 在DSL中，聚合的输入流可以是KStream或KTable，但输出流始终是KTable。这使得Kafka Streams 在产生和发生值后，如果其他记录无序到达，则可以更新汇总值。当发生这种无序到达时，聚合的KStream或KTable会发出新的聚合值。由于输出是表，因此在后续的处理步骤中，新值将被视为使用相同的键覆盖旧值。
 ```
 
-
-
 ### Windowing
 
 
 
-### States
+###States
 
 
 
