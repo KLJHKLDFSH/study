@@ -301,9 +301,27 @@ In the `Kafka Stream DSL`, an intput stream of an `aggregation` can be a KStream
 
 ### Windowing
 
+​	Windowing lets you control how to group records that have the same key for stateful operations such as `aggerattions` or `joins` into so-called windows. Windows are tracked per record key.
+
+```
+通过窗口，你可以控制如何对具有相同键的记录进行分组，以进行有状态操作（例如 聚合或加入所谓的窗口）。每个键都会跟踪windwos。
+```
+
+​	`Windows operations` are available in the `Kafka Stream DSL`. When working with windows, you can specify a grace period for the window. This grace period controls how long Kafka Streams will wait for out-of-order data records for a given window. if a record arrival after the grace period of a window has passed, the record is discarded and will not be processed in that window. Specifically, a record is discarded if its timestamp dictates it belongs to a window, but the current stream time is greater than the end of the window plus the grace period.
+
+```
+窗口操作在Kafka Stream DSL 中是可用的。当窗口运行时，你可以给窗口指定一个`#grace()` 期限。这个期限控制着Kafka Stream 将等待给定窗口多长时间的无序数据记录。如果一个记录在窗口期限过期后到达，那么这个记录被丢弃掉并且将不会在这个窗口中被处理。具体来说， 如果一条记录的时间戳指示它属于某个窗口，则该记录将被丢弃，但是当前流时间大于该窗口的末尾加上期限。
+```
+
+​	Out-of-order records are always possible  in the real world and should be properly accounted in you applications. It depends on the effective `time semantics` how out-of-order records are handled. in the processing-time, the semantics are "when the record is being processed". which means that the notion of out-of-order records is not applicable as, by definition, no record can be out-of-order. Hence, out-of-order records can only be considered as such for event-time. int both case, Kafka Streams is able to properly handle out-of-order records.
+
+```
+无序记录在现实世界总是会出现，应该在你的应用程序中适当的考虑。无须记录的处理根据准确的时间语义。处理时间的语义是：“当记录开始被处理时”，意味着无序记录的概念是不成立的，根据定义，没有记录可以是无序的。因此，无序记录只能被看作是事件时间，在这两种情况下，Kafka Streams 都能正确的处理无序记录。
+```
 
 
-###States
+
+### States
 
 
 
