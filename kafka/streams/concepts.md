@@ -386,6 +386,26 @@ Besides the guarantee that each record will be processed exactly-once, another i
 
 For stateless operations, out-of-order data will not impact processing logic since only one record is considered at a time, without looking into the history of past processed records; for stateful operations such as aggregations and joins, however, out-of-order data could cause the processing logic to be incorrect. if users want to handle such out-of-order data, generally they need to allow their applications to wait for longer time while bookkeeping their states during the wait time, i.e. making trade-off decisions between latency, cost, and correctness. In kafka Streams specifically, user can configure their window operators for windowed aggregations to achieve such trade-offs(detail can be found in  [**Developer Guide**](http://kafka.apache.org/28/documentation/streams/developer-guide)). As for Joins,  users have to be aware that some of the out-of-order data connot be handled by increasing on latency and cost in Stream yet:
 
+```
+对于无状态操作，无序数据将不影响处理逻辑，因为一次只考虑一个记录，而无需查看过去处理记录的历史记录。对于有状态操作，例如聚合和关联，然而，乱序的数据可能会导致处理逻辑不正确。如果用户想要处理之类乱序数据，一般来说它们需要允许他们的应用程序等待更长的时间，同时在等待时间内记录其状态。即在等待时间，成本和正确性之间做出权衡决策。特别是在Kafka Streams 中，用户可以为窗口聚合配置其窗口运算符，以达到这种平衡。至于关联，用户必须知道一些无序数据不能通过增加Streams中的延时和成本来处理：
+```
+
 - For Stream-Stream joins, all three types(inner, out, left) handle out-of-order records correctly. but the resulted stream may contain unnecessary leftRecord-null for left joins, and leftRecord-null or null-rightRecord for outer joins.
+
+  ```
+  流于流关联：所有三种类型（内，外，左）都可以正确处理乱序记录。但是对于左联结，结果流可能包含不必要的leftRecord-null;对于外联结：结果流可能包含不必要的leftRecord-null 或 null-rightRecord。
+  ```
+
 - For Stream-Table joins, out-of-order records are not handled(i.e. Streams applications don't check for out-of-order records and just process all records in offset order), and hence it may produce unpredictable results.
+
+  ```
+  对于流-表关联：乱序数据是不能被处理的（即：流应用不会检查乱序记录，而只会以offset顺序处理所有记录），因此它可能会产出不可预测的结果。
+  ```
+
 - For Table-Table joins, out-of-order records are not handled (i.e. Streams applications don't check for out-of-order records and just process all records in offset order). However, the join result is a changlog stream and hence will be eventually consistent
+
+  ```
+  表-表关联：乱序记录不会被处理（即：Streams 应用不检查无序记录，而仅以offset顺序处理所有记录），然而，关联结果是变更日志流，因此最终将保持一致。
+  ```
+
+  
