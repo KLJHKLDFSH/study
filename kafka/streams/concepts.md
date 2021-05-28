@@ -337,7 +337,55 @@ Some stream processing application don't require state, which means the processi
 
 ## Processing Guarantees
 
+In stream processing, one of the most frequently asked question is "does my stream processing system guarantee that each record is processed once and only once, even if some failures are encountered in the middle of processing?" Failing to guarantee exactly-once stream processing is deal-breaker for many applications that cannot tolerate any data-loss or data duplicates, and in that case a batch-oriented framework is usually used in addition to the stream processing pipeline, known as the Lambda-Architecture. Prior to 0.11.0.0, Kafka only provides as-least-once delivery gurantees and hence any stream processing systems that leverage it as the backend storage could not guarantee end-to-end exactly-once- semantics. In fact, even for those stream processing systems that claim to support exactly-once processing, as long as they are reading from / writing to kafka as the source / sink, their applications cannot actually guarantee that no duplicates will be generated throughout the pipeline.
+
+```
+在流处理中，最常被问到的问题之一是“我的流处理系统是否保证每条记录仅被处理一次，即时在处理过程中遇到一些故障”? 对于不能忍受任何数据丢失或者数据重复的许多应用程序而言，无法保证一次流处理的成功就成为了难题，并且在这种情况下，除了流处理管道外，通常还使用面向批处理的框架，称为 Lambda 体系结构。在0.11.0.0 之前，Kafka 只提供了最少一次交付保证，因此，任何将其用作后端村粗的流处理系统都无法保证端完全一次语义。事实上，即时对于声称支持一次精确处理的流处理系统，只要它们正在从Kafka读取\写入Kafka作为源\接受器，它们的应用程序实际上也无法保证不会在整个管道中生成renew重复项。
+```
+
+Since the 0.11.0.0 release, Kafka has added support to allow its producers to send messages to different topic partitions in a [transactional and idempotent manner](https://kafka.apache.org/documentation/#semantics), and Kafka Streams has hence added the end-to-end exactly-once processing semantics by leveraging these features. More specifically, it guarantees that for any record read from the source Kafka topics, its processing results will be reflected exactly once in the output kafka topic as well as in the state stores for stateful operations. Note the key difference between Kafka end-to-end exactly-once guarantee with other stream processing frameworks' claimed guarantees is that Kafka Streams tightly integrated with the underlying Kafka storage system and ensure that commits on the input topic offsets, updates on the state stores, and writes to the output topics will be completed atomically instead of treating Kafka as an external system that may have side-effects. For more information on how this done inside Kafka Streams.see [KIP-129][https://cwiki.apache.org/confluence/display/KAFKA/KIP-129%3A+Streams+Exactly-Once+Semantics]. 
+
+```
+自从 0.11.0.0 发行以来，Kafka增加了支持，以允许其生产者以事务性和幂deng方式将消息发送到不同的主题分区。并且因此Kafka Streams 通过利用这些功能添加了端到端精确一次处理语义。 更详细一些，它保证对于从源Kafka主题读取的任何记录，其处理结果将在输出Kafka主题以及用于状态操作的状态存储的状态存储中准确的反映一次。
+注意：Kafka 端到端精确一次保证与其他流处理框架要求的保证之间的主要区别在于：Kafka Streams 于基础Kafka存储系统紧密集成，并确保输入主题进行偏移，对状态存储进行更新。并且对输出主题的写入将自动完成，而不是将Kafka视为可能会有副作用的外部系统。
+```
+
+As of the 2.6.0 release, Kafka Streams supports an improed implementation of exactly-once processing, named "exactly-once beta", which requires broker version 2.5.0 or newer. This implementation is more efficient, because it reduces client and broker resource utilization, like client threads and used network connections, and it enables higher throughput and improved scalability. For more information on how this is done inside the broker and Kafka Streams, see [KIP-447](https://cwiki.apache.org/confluence/display/KAFKA/KIP-447%3A+Producer+scalability+for+exactly+once+semantics).
+
+```
+从2.6.0版本开始，Kafka Streams 支持了一次精确处理的改进，叫做“exactly-once beta, 需要2.5.0版本以上的broker支持。这个实现更高效，因为它减少了客户端和broker的资源利用力，比如客户端线程数和网络连接数，并且它能使吞吐率更高和伸缩性性更好。有关在broker和Kafka Stream中如何完成此操作的更新信息，请看 KIP-447.
+```
+
+To enable exactly-once semantics when running Kafka Streams application, set the `processing.guarantee` config value(default value is at_least_once) to exactly_once for EOS version 1(requires broker version 0.11.0 or newer) or exactly_once_beta for EOS version 2 (requires brokers version 2.5.0 or newer). For more information, see the [Kafka Streams Configs](http://kafka.apache.org/28/documentation/streams/developer-guide/config-streams.html) section.
+
+```
+要在运行Kafka Streams应用程序时启用一次语义，请将EOS版本1（需要代理0.11.0或更高版本）的processing.guarantee配置值（默认值为at_least_once）设置为精确_一次，或将EOS版本2的精确_once_beta设置为（要求代理） 2.5版或更高版本）。 有关更多信息，请参见“ Kafka流配置”部分。
+```
 
 
-### Out-of-Order handling45
 
+### Out-of-Order handling
+
+Besides the guarantee that each record will be processed exactly-once, another issue that many stream processing application will face is how to handle out-of-order data that may impact their business logic. In Kafka Streams, there are two causes that could potentially result in out-of-order data arrivals with respect to their timestamps:
+
+```
+在Kafka Streams 中，有两种原因可能会导致其时间戳相对于数据的无序到达：
+```
+
+- Within a topic-partition, a record's timestamp may not be monotonically increasing along with their offsets. Since Kafka Streams will always try to process records within a topic-partition to follow the offset order, it can cause records with larger timestamps( but smaller offsets) to be processed earlier than records with smaller timestamps(but larger offsets) int the same topic-partition.
+
+  ```
+  在主题分区内，记录的时间不一定是随着偏移量单调递增的。由于Kafka Stream始终会尝试处理主题分区内的记录以遵循偏移量排序，它可能导致具有较大时间戳（但偏移量较小）的记录比在相同的主题分区中具有较小时间戳（但偏移量较大）的记录要早处理。
+  ```
+
+- Within a stream task that may be  processing multiple topic-partitions, if users configure the application to not wait for all partitions to contain some buffered data and pick from the partition with the smallest timestamp to process the next record, then later on when some records are fetched for other topic-partitions, their timestamps may be smaller than those processed records fetched from another topic-partition.
+
+  ```
+  在可能处理多个分区的流任务中，如果用户将应用程序配置为不等待所有分区都包含一些缓存的数据，并从时间戳最小的分区中选取来处理下一条记录，则稍后再处理某些记录时如果是为其他主题分区获取的，则它们的时间戳可能小于从另一个主题分区获取的已处理记录的时间戳。
+  ```
+
+For stateless operations, out-of-order data will not impact processing logic since only one record is considered at a time, without looking into the history of past processed records; for stateful operations such as aggregations and joins, however, out-of-order data could cause the processing logic to be incorrect. if users want to handle such out-of-order data, generally they need to allow their applications to wait for longer time while bookkeeping their states during the wait time, i.e. making trade-off decisions between latency, cost, and correctness. In kafka Streams specifically, user can configure their window operators for windowed aggregations to achieve such trade-offs(detail can be found in  [**Developer Guide**](http://kafka.apache.org/28/documentation/streams/developer-guide)). As for Joins,  users have to be aware that some of the out-of-order data connot be handled by increasing on latency and cost in Stream yet:
+
+- For Stream-Stream joins, all three types(inner, out, left) handle out-of-order records correctly. but the resulted stream may contain unnecessary leftRecord-null for left joins, and leftRecord-null or null-rightRecord for outer joins.
+- For Stream-Table joins, out-of-order records are not handled(i.e. Streams applications don't check for out-of-order records and just process all records in offset order), and hence it may produce unpredictable results.
+- For Table-Table joins, out-of-order records are not handled (i.e. Streams applications don't check for out-of-order records and just process all records in offset order). However, the join result is a changlog stream and hence will be eventually consistent
