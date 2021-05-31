@@ -67,7 +67,7 @@ The following diagram shows two tasks each assigned with open partition of the i
 Kafka Streams allows the user to configure the number of threads that the library can use ti parallelize processing within an application instance. Each thread can execute one or more tasks with their processor topologies independently. For example, the following diagram shows one stream thread running two stream tasks.
 
 ```
-Kafka Streams 允许用户配置库可用于并行处理应用程序实例中的处理的线程数。每个线程可以使用其处理器拓扑独立执行一个或多个任务。例如：下图展示了一个流线程允许两个流任务。
+Kafka Streams 允许用户配置可用于并行处理应用程序实例中的处理的线程数。每个线程可以使用其处理器拓扑独立执行一个或多个任务。例如：下图展示了一个流线程允许两个流任务。
 ```
 
 ![img](http://kafka.apache.org/28/images/streams-architecture-threads.jpg)
@@ -76,5 +76,17 @@ Starting more stream threads or more instances of the application merely amounts
 
 ```
 开启多个流线程获取多个应用程序实例仅仅相当于复制多个拓扑结构并使其处理Kafka分区的不同子集，从而有效的并行处理。值得注意的是，它们没有共享其线程中的状态，所以不需要线程间的协调，这使得跨应用程序实例和线程并行运行拓扑非常简单。Kafka Streams 利用Kafka的协调功能来透明地处理各个流线程之间的Kafka主题分区分配。
+```
+
+As we described above, scaling you stream processing application with Kafka Streams is easy: you merely need to start additional instances of you application, and Kafka Streams takes care of distributing partitions amongst tasks that run in the application instances. You can start as many threads of the application as there are input Kafka topic partition so that. across all running instances of an application, every thread(or rather, the tasks it runs) has at least one input partition to process.
+
+```
+正如我们上面说的：用Kafka Stream 扩展你的流处理程序是简单的。你仅仅需要开启额外的应用程序实例，Kafka Streams 就会在应用程序实例中运行的任务之间分配分区。你可以启动与输入Kafka主题分区一样多的应用程序线程，以便在应用程序的所有正在运行实例中，每个线程至少具有一个要处理的输入分区。
+```
+
+As of Kafka 2.8 you can scale stream threads much in the same way you can scale your Kafka Stream clients. Simply add or remove stream threads and Kafka Streams will take care of redistributing the partitions. you may also add threads to replace stream threads that have died removing the need to restart clients to recover the number of thread running.
+
+```
+在2.8版本后，你可以以扩展KafkaStream客户端相同的方式扩展流程序。简单的添加或一处stream线程，Kafka Streams将负责重新分配分区。你也可以提那家线程来替换已死的steam线程，从而无需重新启动客户端以恢复正在运行的线程数。
 ```
 
