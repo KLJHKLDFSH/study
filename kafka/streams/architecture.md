@@ -90,3 +90,5 @@ As of Kafka 2.8 you can scale stream threads much in the same way you can scale 
 在2.8版本后，你可以以扩展KafkaStream客户端相同的方式扩展流程序。简单的添加或一处stream线程，Kafka Streams将负责重新分配分区。你也可以提那家线程来替换已死的steam线程，从而无需重新启动客户端以恢复正在运行的线程数。
 ```
 
+
+
