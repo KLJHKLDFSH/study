@@ -1,3 +1,5 @@
+
+
 # Red Black Tree
 
 #### 简介：
@@ -340,7 +342,7 @@ void insert(Tree t, Node z){
     ​	我们需要把树通过旋转操作成什么样的结构才能保证红黑性质呢？
 
     	1. 同一层的节点的颜色都是一样的
-     	2. 子节点与父节点都不一样。
+    	2. 子节点与父节点都不一样。
 
     ​	节点间的关系对操作有什么影响吗？
 
@@ -408,24 +410,40 @@ void insert(Tree t, Node z){
 	红黑树插入后修复
 */
 void brTreeInsertFixup(Tree t,Node z){
-	if(z.p.color == RED){					//
-        if(z.p == z.p.p.left){				//
+    while (z.p.color == Color.RED){				//
+        if(z.p == z.p.p.left){					//
             Node y = z.p.p.right;
-        }
-        if( y.color == RED){				//颜色相同
-            z.p.sp.color = RED;
-			z.p.color = BLACK;
-			y.color = BLACK;
-			z = gp;
-        }else if(z == z.p.left){
-            z.p.p.color = RED;
-		    z.p.color = BLACK;
-    		rightRatation(t, z.p.p)		//gp 与 p 的旋转
+            if( y.color == Color.RED){			//颜色相同
+                z.p.p.color = Color.RED;
+                z.p.color = Color.BLACK;
+                y.color = Color.BLACK;
+                z = z.p.p;
+            }else if(z == z.p.left){
+                z.p.p.color = Color.RED;
+                z.p.color = Color.BLACK;
+                rightRatation(t, z.p.p)			//gp 与 p 的旋转
+            }else{
+                z = z.p; 						//将指针上移，
+                leftRotation(t, z);  			//通过左旋造成z是左节点的情景
+            }
         }else{
-            z = z.p; 						//将指针上移，
-			leftRotation(t, z);  			//通过左旋造成z是左节点的情景
+            Node y = z.p.p.left;
+            if (y.color == Color.RED){
+                z.p.p.color = Color.RED;
+                z.p.color = Color.BLACK;
+                y.color = Color.BLACk;
+                z = z.p.p;
+            }else if(z = z.p.right){
+                z.p.p.color = Color.RED;
+                z.p.color = Color.BLACK;
+                leftRotation(t, z.p.p);
+            }else{
+                z = z.p;
+                rightRatation(t, z);
+            }
         }
     }
+    t.root.color = Color.BLACk;
 }
 ```
 
