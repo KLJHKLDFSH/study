@@ -54,3 +54,8 @@ sudo bin/kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic quic
 sudo bin/kafka-topics.sh --list --bootstrap-server localhost:9092
 ```
 
+- config
+
+- 
+
+  
